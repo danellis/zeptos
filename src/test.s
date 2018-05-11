@@ -33,6 +33,10 @@ test:
 loop:
     eor r2, r2, 1 << 5
     str r2, [r1]
+    mov r0, #0x180000
+wait:
+    subs r0, r0, #1
+    bne wait
     b loop
 
 // Vector table
