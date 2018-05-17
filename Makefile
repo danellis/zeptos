@@ -1,5 +1,5 @@
 PROJECT = zeptos
-SRC = test
+SRC = reset init
 
 GCC_PREFIX = arm-none-eabi-
 CC = $(GCC_PREFIX)gcc
