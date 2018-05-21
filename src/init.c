@@ -1,6 +1,6 @@
-#include "stm32f4.h"
-
 #include <stdbool.h>
+#include "stm32f4.h"
+#include "debug.h"
 
 void led(bool on) {
     GPIOA_ODR = on ? 1 << 5 : 0;
@@ -8,14 +8,10 @@ void led(bool on) {
 
 void init(void) {
     // Enable GPIOA peripheral clock
-    RCC_AHB1ENR = RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
+    RCC_AHB1ENR = RCC_AHB1ENR_GPIOAEN;
 
-    // Set PA5 to output and PA8 to MCO1
-    GPIOA_MODER = 0b01 << 10 | 0b10 << 16;
-    GPIOA_OSPEEDR |= 3 << 16;
-
-    // Set PC9 MCO2
-    GPIOC_MODER = 0b10 << 18;
+    // Set PA5 to output
+    GPIOA_MODER = 0b01 << 10;
 
     // Turn on HSE
     RCC_CR |= RCC_CR_HSEON;
@@ -28,8 +24,8 @@ void init(void) {
     // System clock = 84MHz, PLL48CLK = 48MHz
     RCC_PLLCFGR = (RCC_PLLCFGR & RCC_PLLCFGR_RESERVED_MASK)
         | RCC_PLLCFGR_PLLSRC // Set HSE as PLL source
-        | (4 << RCC_PLLCFGR_PLLM_BIT) // M = 8
-        | (168 << RCC_PLLCFGR_PLLN_BIT) // N = 336
+        | (8 << RCC_PLLCFGR_PLLM_BIT) // M = 8
+        | (336 << RCC_PLLCFGR_PLLN_BIT) // N = 336
         | (1 << RCC_PLLCFGR_PLLP_BIT) // P = 4
         | (7 << RCC_PLLCFGR_PLLQ_BIT) // Q = 7
     ;
@@ -40,14 +36,17 @@ void init(void) {
 
     RCC_CFGR = 
         (2 << RCC_CFGR_SW_BIT) // Use PLL as clock source
-        | (0b11 << 21) // Output PLL on MCO1
-        | (0b10 << 30) // Output HSE on MCO2
+        | (0b100 << RCC_CFGR_PPRE1_BIT) // Prescale APB1 clock /2
     ;
 
     // Wait for clock source to change
     while ((RCC_CFGR & (2 << RCC_CFGR_SWS_BIT)) == 0);
 
-    led(true);
+    debug_init();
+
+    for (;;) {
+        debug_putc('H'); debug_putc('I');
+    }
 
     // Set SysTick doing its funky thang
     SYST_CVR = SYST_RVR = (84000000 / 8 / 100) - 1; // 100Hz
