@@ -1,5 +1,5 @@
 PROJECT = zeptos
-SRC = reset init
+SRC = reset init debug
 
 GCC_PREFIX = arm-none-eabi-
 CC = $(GCC_PREFIX)gcc
@@ -16,7 +16,7 @@ OBJ = $(SRC:%=build/%.o)
 CPU_FLAGS = -mcpu=cortex-m4 -mthumb
 INC = -Isrc
 
-CC_FLAGS = -g -std=gnu99 $(CPU_FLAGS) $(INC) -Wall -Werror -Wno-unused-function -fstack-usage -funsigned-bitfields
+CC_FLAGS = -g -std=gnu99 -O0 $(CPU_FLAGS) $(INC) -Wall -Werror -Wno-unused-function -fstack-usage -funsigned-bitfields
 AS_FLAGS = $(CPU_FLAGS) -Wall
 LD_FLAGS = -nostartfiles $(CPU_FLAGS) -Wl,-gc-sections -Wl,-Map=$(TARGET).map -T link.ld
 
