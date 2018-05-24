@@ -81,11 +81,11 @@ copy_bss_section:
 .section vectors
     .word __stack_top
     .word reset_handler
-    .word 0 // NMI
-    .word 0 // Hard fault
-    .word 0 // Memory management
-    .word 0 // Bus fault
-    .word 0 // Usage fault
+    .word panic // NMI
+    .word panic // Hard fault
+    .word panic // Memory management
+    .word panic // Bus fault
+    .word panic // Usage fault
     .word 0 // Reserved
     .word 0 // Reserved
     .word 0 // Reserved

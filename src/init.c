@@ -64,6 +64,8 @@ void init(void) {
 
     debug_writes("systick: 1Hz\n");
 
+    debug_printf("printf test %i, %c, %s, %p... ~F3~B4HELLO!", 123, 'x', "foo", debug_printf);
+
     for (;;) {
         debug_writes("*");
         while ((SYST_CSR & SYST_CSR_COUNTFLAG) == 0);

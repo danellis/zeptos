@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdarg.h>
 #include "stm32f4.h"
 
 void debug_init(void) {
@@ -24,4 +25,88 @@ void debug_writes(const char *s) {
     while (*s) {
         debug_writec(*s++);
     }
+}
+
+static const char lower_digits[] = "0123456789abcdef";
+static const char upper_digits[] = "0123456789ABCDEF";
+
+static const char *format_integer(char *end, unsigned int i, int base, bool upper) {
+    const char *digits = upper ? upper_digits : lower_digits;
+
+    *--end = 0;
+
+    if (i == 0) {
+        *--end = '0';
+    } else {
+        while (i) {
+            *--end = digits[i % base];
+            i /= base;
+        }
+    }
+
+    return end;
+}
+
+static void debug_vprintf(const char *fmt, va_list args) {
+    char c, type, color;
+    char buffer[21], *buffer_end = buffer + sizeof(buffer) - 1;
+    const char *start;
+    *buffer_end = 0;
+
+    while ((c = *fmt++)) {
+        if (c == '%') {
+            if ((type = *fmt++) == 0) break;
+            switch (type) {
+                case 'c':
+                    debug_writec(va_arg(args, int));
+                    break;
+
+                case 's':
+                    start = va_arg(args, const char *);
+                    debug_writes(start ? start : "(null)");
+                    break;
+
+                case 'i':
+                    start = format_integer(buffer_end, va_arg(args, unsigned int), 10, false);
+                    debug_writes(start);
+                    break;
+
+                case 'x':
+                    start = format_integer(buffer_end, va_arg(args, unsigned int), 16, false);
+                    debug_writes(start);
+                    break;
+
+                case 'X':
+                    start = format_integer(buffer_end, va_arg(args, unsigned int), 16, true);
+                    debug_writes(start);
+                    break;
+
+                case 'p':
+                    for (int i = 28; i >= 0; i -= 4) {
+                        debug_writec(lower_digits[((uint32_t) va_arg(args, void *) >> i) & 0xf]);
+                    }
+                    break;
+
+                default:
+                    debug_writec(type);
+                    break;
+            }
+        } else if (c == '~') {
+            if ((type = *fmt++) == 0 || (color = *fmt++) == 0) break;
+            debug_writes("\e[");
+            if (type == 'F') debug_writec('3');
+            if (type == 'B') debug_writec('4');
+            debug_writec(color);
+            debug_writec('m');
+        } else {
+            debug_writec(c);
+        }
+    }
+}
+
+void debug_printf(const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    debug_vprintf(fmt, args);
+    va_end(args);
 }
