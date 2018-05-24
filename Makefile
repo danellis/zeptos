@@ -1,5 +1,5 @@
 PROJECT = zeptos
-SRC = reset init debug panic
+SRC = reset init debug panic systick
 
 GCC_PREFIX = arm-none-eabi-
 CC = $(GCC_PREFIX)gcc

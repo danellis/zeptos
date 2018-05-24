@@ -94,4 +94,4 @@ copy_bss_section:
     .word 0 // Debug monitor
     .word 0 // Reserved
     .word 0 // PendSV
-    .word 0 // SysTick
+    .word systick_handler // SysTick

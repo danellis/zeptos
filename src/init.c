@@ -60,15 +60,11 @@ void init(void) {
     // Set SysTick doing its funky thang
     SYST_RVR = (84000000 / 8) - 1; // 1Hz
     SYST_CVR = 0;
-    SYST_CSR = 0b001;
+    SYST_CSR = 0b011;
 
     debug_writes("systick: 1Hz\n");
 
     debug_printf("printf test %i, %c, %s, %p... ~F3~B4HELLO!", 123, 'x', "foo", debug_printf);
 
-    for (;;) {
-        debug_writes("*");
-        while ((SYST_CSR & SYST_CSR_COUNTFLAG) == 0);
-        GPIOA_ODR ^= 1 << 5;
-    }
+    for (;;);
 }
