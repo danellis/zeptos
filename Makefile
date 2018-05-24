@@ -26,7 +26,7 @@ $(OBJ): Makefile
 
 $(TARGET).elf: builddir $(OBJ) link.ld
 	$(CC) $(LD_FLAGS) $(OBJ) -o $@
-	$(SIZE) -B -t --common $(OBJ) $@
+	$(SIZE) -B --common $(OBJ) $@
 
 $(TARGET).bin: $(TARGET).elf
 	$(OBJCOPY) -O binary $< $@
